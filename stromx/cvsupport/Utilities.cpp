@@ -17,7 +17,11 @@
 #include "stromx/cvsupport/Utilities.h"
 
 #include <stromx/runtime/DataContainer.h>
+#include <stromx/runtime/EnumParameter.h>
 #include <stromx/runtime/Exception.h>
+#include <stromx/runtime/List.h>
+#include <stromx/runtime/MatrixDescription.h>
+#include <stromx/runtime/MatrixParameter.h>
 
 #include "stromx/cvsupport/Matrix.h"
 #include "stromx/cvsupport/Image.h"
@@ -45,6 +49,19 @@ namespace stromx
             uint8_t* data = const_cast<uint8_t*>(matrix.data());
             
             return cv::Mat(matrix.rows(), matrix.cols() / numChannels, cvType, data, matrix.stride());
+        }
+        
+        std::vector<cv::Mat> getOpenCvMatVector(const runtime::List& list)
+        {
+            std::vector<cv::Mat> vector;
+            std::vector<const Data*> content = list.content();
+            for(std::vector<const Data*>::const_iterator iter = content.begin();
+                iter != content.end(); ++iter)
+            {
+                const runtime::Matrix* matrix = runtime::data_cast<runtime::Matrix>(*iter);
+                vector.push_back(getOpenCvMat(*matrix));
+            }
+            return vector;
         }
         
         runtime::Image::PixelType computeOutPixelType(const int outDdepth,
@@ -127,6 +144,56 @@ namespace stromx
                 return runtime::Image::BGR_48;
             default:
                 throw runtime::InternalError("Invalid output pixel type.");
+            }
+        }
+        
+        void checkEnumValue(const stromx::runtime::Enum & value, const stromx::runtime::EnumParameter* param, const stromx::runtime::OperatorInfo& op)
+        {
+            using namespace runtime;
+            
+            for(std::vector<EnumDescription>::const_iterator iter = param->descriptions().begin(); iter != param->descriptions().end(); ++iter)
+            {
+                 if(value == iter->value())
+                return;
+            }
+            throw stromx::runtime::WrongParameterValue(*param, op);
+        }
+        
+        void checkMatrixValue(const stromx::runtime::Matrix & value,
+                             const stromx::runtime::MatrixDescription* desc,
+                             const stromx::runtime::OperatorInfo& op)
+        {
+            if(desc->rows() && value.rows() != desc->rows())
+            {
+                std::ostringstream str;
+                str << desc->rows();
+                throw runtime::InputError(desc->id(), op, "Number of matrix rows must be " + str.str() + " .");
+            }
+            
+            if(desc->cols() && value.cols() != desc->cols())
+            {
+                std::ostringstream str;
+                str << desc->cols();
+                throw runtime::InputError(desc->id(), op, "Number of matrix columns must be " + str.str() + " .");
+            }
+        }
+        
+        void checkMatrixValue(const stromx::runtime::Matrix & value,
+                              const stromx::runtime::MatrixParameter* param,
+                              const stromx::runtime::OperatorInfo& op)
+        {
+            if(param->rows() && value.rows() != param->rows())
+            {
+                std::ostringstream str;
+                str << param->rows();
+                throw runtime::WrongParameterValue(*param, op, "Number of matrix rows must be " + str.str() + " .");
+            }
+            
+            if(param->cols() && value.cols() != param->cols())
+            {
+                std::ostringstream str;
+                str << param->cols();
+                throw runtime::WrongParameterValue(*param, op, "Number of matrix columns must be " + str.str() + " .");
             }
         }
     }

@@ -64,6 +64,31 @@ namespace stromx
             copy(matrix);
         }
 
+        Matrix::Matrix(const cv::Rect& cvRect)
+          : m_matrix(new cv::Mat(1, 4, CV_32S))
+        {
+            getDataFromCvMatrix(valueTypeFromCvType(m_matrix->type()));
+            
+            int32_t* data = reinterpret_cast<int32_t*>(this->data());
+            data[0] = cvRect.x;
+            data[1] = cvRect.y;
+            data[2] = cvRect.width;
+            data[3] = cvRect.height;
+        }
+
+        Matrix::Matrix(const cv::RotatedRect& cvRotatedRect)
+          : m_matrix(new cv::Mat(1, 5, CV_32F))
+        {
+            getDataFromCvMatrix(valueTypeFromCvType(m_matrix->type()));
+            
+            float* data = reinterpret_cast<float*>(this->data());
+            data[0] = cvRotatedRect.center.x;
+            data[1] = cvRotatedRect.center.y;
+            data[2] = cvRotatedRect.size.width;
+            data[3] = cvRotatedRect.size.height;
+            data[4] = cvRotatedRect.angle;
+        }
+            
         Matrix::Matrix(const stromx::cvsupport::Matrix& matrix)
           : MatrixWrapper(), // fixes GCC warning
             m_matrix(new cv::Mat())

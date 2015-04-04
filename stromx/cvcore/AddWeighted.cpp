@@ -10,6 +10,7 @@
 #include <stromx/runtime/Id2DataComposite.h>
 #include <stromx/runtime/Id2DataPair.h>
 #include <stromx/runtime/ReadAccess.h>
+#include <stromx/runtime/VariantComposite.h>
 #include <stromx/runtime/WriteAccess.h>
 #include <opencv2/core/core.hpp>
 
@@ -59,55 +60,55 @@ namespace stromx
                 case ALPHA:
                     {
                         const runtime::Float64 & castedValue = runtime::data_cast<runtime::Float64>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_64))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_64))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_alphaParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_alphaParameter, *this);
                         m_alpha = castedValue;
                     }
                     break;
                 case BETA:
                     {
                         const runtime::Float64 & castedValue = runtime::data_cast<runtime::Float64>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_64))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_64))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_betaParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_betaParameter, *this);
                         m_beta = castedValue;
                     }
                     break;
                 case DDEPTH:
                     {
                         const runtime::Enum & castedValue = runtime::data_cast<runtime::Enum>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::ENUM))
+                        if(! castedValue.variant().isVariant(runtime::Variant::ENUM))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkEnumValue(castedValue, m_ddepthParameter, *this);
+                        cvsupport::checkEnumValue(castedValue, m_ddepthParameter, *this);
                         m_ddepth = castedValue;
                     }
                     break;
                 case GAMMA:
                     {
                         const runtime::Float64 & castedValue = runtime::data_cast<runtime::Float64>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_64))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_64))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_gammaParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_gammaParameter, *this);
                         m_gamma = castedValue;
                     }
                     break;
                 case DATA_FLOW:
                     {
                         const runtime::Enum & castedValue = runtime::data_cast<runtime::Enum>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::ENUM))
+                        if(! castedValue.variant().isVariant(runtime::Variant::ENUM))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkEnumValue(castedValue, m_dataFlowParameter, *this);
+                        cvsupport::checkEnumValue(castedValue, m_dataFlowParameter, *this);
                         m_dataFlow = castedValue;
                     }
                     break;
@@ -208,15 +209,15 @@ namespace stromx
             {
             case(MANUAL):
                 {
-                    m_src1Description = new runtime::Description(SRC_1, runtime::DataVariant::IMAGE);
+                    m_src1Description = new runtime::Description(SRC_1, runtime::Variant::IMAGE);
                     m_src1Description->setTitle(L_("Source 1"));
                     inputs.push_back(m_src1Description);
                     
-                    m_src2Description = new runtime::Description(SRC_2, runtime::DataVariant::IMAGE);
+                    m_src2Description = new runtime::Description(SRC_2, runtime::Variant::IMAGE);
                     m_src2Description->setTitle(L_("Source 2"));
                     inputs.push_back(m_src2Description);
                     
-                    m_dstDescription = new runtime::Description(DST, runtime::DataVariant::IMAGE);
+                    m_dstDescription = new runtime::Description(DST, runtime::Variant::IMAGE);
                     m_dstDescription->setTitle(L_("Destination"));
                     inputs.push_back(m_dstDescription);
                     
@@ -224,11 +225,11 @@ namespace stromx
                 break;
             case(ALLOCATE):
                 {
-                    m_src1Description = new runtime::Description(SRC_1, runtime::DataVariant::IMAGE);
+                    m_src1Description = new runtime::Description(SRC_1, runtime::Variant::IMAGE);
                     m_src1Description->setTitle(L_("Source 1"));
                     inputs.push_back(m_src1Description);
                     
-                    m_src2Description = new runtime::Description(SRC_2, runtime::DataVariant::IMAGE);
+                    m_src2Description = new runtime::Description(SRC_2, runtime::Variant::IMAGE);
                     m_src2Description->setTitle(L_("Source 2"));
                     inputs.push_back(m_src2Description);
                     
@@ -247,7 +248,7 @@ namespace stromx
             {
             case(MANUAL):
                 {
-                    runtime::Description* dst = new runtime::Description(DST, runtime::DataVariant::IMAGE);
+                    runtime::Description* dst = new runtime::Description(DST, runtime::Variant::IMAGE);
                     dst->setTitle(L_("Destination"));
                     outputs.push_back(dst);
                     
@@ -255,7 +256,7 @@ namespace stromx
                 break;
             case(ALLOCATE):
                 {
-                    runtime::Description* dst = new runtime::Description(DST, runtime::DataVariant::IMAGE);
+                    runtime::Description* dst = new runtime::Description(DST, runtime::Variant::IMAGE);
                     dst->setTitle(L_("Destination"));
                     outputs.push_back(dst);
                     
@@ -353,10 +354,10 @@ namespace stromx
                     
                     cv::addWeighted(src1CvData, alphaCvData, src2CvData, betaCvData, gammaCvData, dstCvData, ddepthCvData);
                     
-                    runtime::DataContainer outContainer = inContainer;
-                    runtime::Id2DataPair outputMapper(DST, outContainer);
+                    runtime::DataContainer dstOutContainer = inContainer;
+                    runtime::Id2DataPair dstOutMapper(DST, dstOutContainer);
                     
-                    provider.sendOutputData(outputMapper);
+                    provider.sendOutputData(dstOutMapper);
                 }
                 break;
             case(ALLOCATE):
@@ -409,13 +410,13 @@ namespace stromx
                     cv::addWeighted(src1CvData, alphaCvData, src2CvData, betaCvData, gammaCvData, dstCvData, ddepthCvData);
                     
                     runtime::Image* dstCastedData = new cvsupport::Image(dstCvData);
-                    runtime::DataContainer outContainer = runtime::DataContainer(dstCastedData);
-                    runtime::Id2DataPair outputMapper(DST, outContainer);
+                    runtime::DataContainer dstOutContainer = runtime::DataContainer(dstCastedData);
+                    runtime::Id2DataPair dstOutMapper(DST, dstOutContainer);
                     
                     runtime::Image::PixelType pixelType = cvsupport::computeOutPixelType(convertDdepth(m_ddepth), src1CastedData->pixelType());
                     unsigned int stride = runtime::Image::pixelSize(pixelType) * src1CastedData->width();
                     dstCastedData->initializeImage(dstCastedData->width(), dstCastedData->height(), stride, dstCastedData->data(), pixelType);
-                    provider.sendOutputData(outputMapper);
+                    provider.sendOutputData(dstOutMapper);
                 }
                 break;
             }
@@ -436,6 +437,6 @@ namespace stromx
             }
         }
         
-    }
-}
+    } // cvcore
+} // stromx
 

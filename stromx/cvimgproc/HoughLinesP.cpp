@@ -10,6 +10,7 @@
 #include <stromx/runtime/Id2DataComposite.h>
 #include <stromx/runtime/Id2DataPair.h>
 #include <stromx/runtime/ReadAccess.h>
+#include <stromx/runtime/VariantComposite.h>
 #include <stromx/runtime/WriteAccess.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -62,66 +63,66 @@ namespace stromx
                 case MAX_LINE_GAP:
                     {
                         const runtime::Float64 & castedValue = runtime::data_cast<runtime::Float64>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_64))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_64))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_maxLineGapParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_maxLineGapParameter, *this);
                         m_maxLineGap = castedValue;
                     }
                     break;
                 case MIN_LINE_LENGTH:
                     {
                         const runtime::Float64 & castedValue = runtime::data_cast<runtime::Float64>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_64))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_64))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_minLineLengthParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_minLineLengthParameter, *this);
                         m_minLineLength = castedValue;
                     }
                     break;
                 case RHO:
                     {
                         const runtime::Float64 & castedValue = runtime::data_cast<runtime::Float64>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_64))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_64))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_rhoParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_rhoParameter, *this);
                         m_rho = castedValue;
                     }
                     break;
                 case THETA:
                     {
                         const runtime::Float64 & castedValue = runtime::data_cast<runtime::Float64>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_64))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_64))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_thetaParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_thetaParameter, *this);
                         m_theta = castedValue;
                     }
                     break;
                 case THRESHOLD:
                     {
                         const runtime::UInt32 & castedValue = runtime::data_cast<runtime::UInt32>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::UINT_32))
+                        if(! castedValue.variant().isVariant(runtime::Variant::UINT_32))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkNumericValue(castedValue, m_thresholdParameter, *this);
+                        cvsupport::checkNumericValue(castedValue, m_thresholdParameter, *this);
                         m_threshold = castedValue;
                     }
                     break;
                 case DATA_FLOW:
                     {
                         const runtime::Enum & castedValue = runtime::data_cast<runtime::Enum>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::ENUM))
+                        if(! castedValue.variant().isVariant(runtime::Variant::ENUM))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkEnumValue(castedValue, m_dataFlowParameter, *this);
+                        cvsupport::checkEnumValue(castedValue, m_dataFlowParameter, *this);
                         m_dataFlow = castedValue;
                     }
                     break;
@@ -190,7 +191,7 @@ namespace stromx
             {
             case(ALLOCATE):
                 {
-                    m_srcDescription = new runtime::Description(SRC, runtime::DataVariant::MONO_IMAGE);
+                    m_srcDescription = new runtime::Description(SRC, runtime::Variant::MONO_IMAGE);
                     m_srcDescription->setTitle(L_("Source"));
                     inputs.push_back(m_srcDescription);
                     
@@ -209,8 +210,10 @@ namespace stromx
             {
             case(ALLOCATE):
                 {
-                    runtime::Description* dst = new runtime::Description(DST, runtime::DataVariant::MATRIX);
+                    runtime::MatrixDescription* dst = new runtime::MatrixDescription(DST, runtime::Variant::MATRIX);
                     dst->setTitle(L_("Destination"));
+                    dst->setRows(0);
+                    dst->setCols(4);
                     outputs.push_back(dst);
                     
                 }
@@ -261,15 +264,15 @@ namespace stromx
                     dstCvData = dstCvData.reshape(1, dstCvData.cols);
                     
                     runtime::Matrix* dstCastedData = new cvsupport::Matrix(dstCvData);
-                    runtime::DataContainer outContainer = runtime::DataContainer(dstCastedData);
-                    runtime::Id2DataPair outputMapper(DST, outContainer);
+                    runtime::DataContainer dstOutContainer = runtime::DataContainer(dstCastedData);
+                    runtime::Id2DataPair dstOutMapper(DST, dstOutContainer);
                     
-                    provider.sendOutputData(outputMapper);
+                    provider.sendOutputData(dstOutMapper);
                 }
                 break;
             }
         }
         
-    }
-}
+    } // cvimgproc
+} // stromx
 

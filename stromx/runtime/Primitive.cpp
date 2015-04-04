@@ -34,7 +34,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & Bool::variant() const { return DataVariant::BOOL; }
+        const VariantHandle & Bool::variant() const { return Variant::BOOL; }
         template<>
         const std::string Bool::TYPE = "Bool";
         template<>
@@ -55,7 +55,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & Int8::variant() const { return DataVariant::INT_8; }
+        const VariantHandle & Int8::variant() const { return Variant::INT_8; }
         template<>
         const std::string Int8::TYPE = "Int8";
         template<>
@@ -82,7 +82,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & UInt8::variant() const { return DataVariant::UINT_8; }
+        const VariantHandle & UInt8::variant() const { return Variant::UINT_8; }
         template<>
         const std::string UInt8::TYPE = "UInt8";
         template<>
@@ -109,7 +109,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & Int16::variant() const { return DataVariant::INT_16; }
+        const VariantHandle & Int16::variant() const { return Variant::INT_16; }
         template<>
         const std::string Int16::TYPE = "Int16";
         template<>
@@ -134,7 +134,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & UInt16::variant() const { return DataVariant::UINT_16; }
+        const VariantHandle & UInt16::variant() const { return Variant::UINT_16; }
         template<>
         const std::string UInt16::TYPE = "UInt16";
         template<>
@@ -159,7 +159,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & Int32::variant() const { return DataVariant::INT_32; }
+        const VariantHandle & Int32::variant() const { return Variant::INT_32; }
         template<>
         const std::string Int32::TYPE = "Int32";
         template<>
@@ -184,7 +184,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & UInt32::variant() const { return DataVariant::UINT_32; }
+        const VariantHandle & UInt32::variant() const { return Variant::UINT_32; }
         template<>
         const std::string UInt32::TYPE = "UInt32";
         template<>
@@ -209,7 +209,57 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & Float32::variant() const { return DataVariant::FLOAT_32; }
+        const VariantHandle & Int64::variant() const { return Variant::INT_64; }
+        template<>
+        const std::string Int64::TYPE = "Int64";
+        template<>
+        const Int64 Int64::MIN = Int64(INT64_MIN);
+        template<>
+        const Int64 Int64::MAX = Int64(INT64_MAX);
+        template<>
+        const std::string Int64::PACKAGE = STROMX_RUNTIME_PACKAGE_NAME;
+        template<>
+        const Version Int64::VERSION = Version(VERSION_MAJOR, VERSION_MINOR, VERSION_DESCRIPTION);
+        
+        template <>
+        void Int64::serialize(OutputProvider & out) const
+        {
+            out.text() << m_value;
+        }
+        
+        template <>
+        void Int64::deserialize(InputProvider & in, const Version &)
+        {
+            in.text() >> m_value;
+        }
+        
+        template<>
+        const VariantHandle & UInt64::variant() const { return Variant::UINT_64; }
+        template<>
+        const std::string UInt64::TYPE = "UInt64";
+        template<>
+        const UInt64 UInt64::MIN = UInt64(0);
+        template<>
+        const UInt64 UInt64::MAX = UInt64(UINT64_MAX);
+        template<>
+        const std::string UInt64::PACKAGE = STROMX_RUNTIME_PACKAGE_NAME;
+        template<>
+        const Version UInt64::VERSION = Version(VERSION_MAJOR, VERSION_MINOR, VERSION_DESCRIPTION);
+        
+        template <>
+        void UInt64::serialize(OutputProvider & out) const
+        {
+            out.text() << m_value;
+        }
+        
+        template <>
+        void UInt64::deserialize(InputProvider & in, const Version &)
+        {
+            in.text() >> m_value;
+        }
+        
+        template<>
+        const VariantHandle & Float32::variant() const { return Variant::FLOAT_32; }
         template<>
         const std::string Float32::TYPE = "Float32";
         template<>
@@ -234,7 +284,7 @@ namespace stromx
         }
         
         template<>
-        const DataVariant & Float64::variant() const { return DataVariant::FLOAT_64; }
+        const VariantHandle & Float64::variant() const { return Variant::FLOAT_64; }
         template<>
         const std::string Float64::TYPE = "Float64";
         template<>

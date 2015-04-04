@@ -17,12 +17,14 @@
 *  along with stromx-studio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stromx/test/TestDataOperator.h"
-
+#define _USE_MATH_DEFINES
 #include <cmath>
+
+#include "stromx/test/TestDataOperator.h"
 
 #include <stromx/cvsupport/Image.h>
 #include <stromx/cvsupport/Matrix.h>
+#include <stromx/runtime/List.h>
 #include <stromx/runtime/DataProvider.h>
 #include <stromx/runtime/EnumParameter.h>
 #include <stromx/runtime/Id2DataPair.h>
@@ -133,6 +135,9 @@ namespace stromx
             case POINTS:
                 data = points();
                 break;
+            case POLYGONS:
+                data = polygons();
+                break;
             default:
                 ;
             }
@@ -155,7 +160,7 @@ namespace stromx
         {
             std::vector<const Description*> outputs;
             
-            Description* description = new Description(OUTPUT, DataVariant::NONE);
+            Description* description = new Description(OUTPUT, Variant::NONE);
             description->setTitle("Output");
             outputs.push_back(description);
             
@@ -189,6 +194,7 @@ namespace stromx
             enumParam->add(EnumDescription(Enum(HISTOGRAM), "Histogram"));
             enumParam->add(EnumDescription(Enum(LINE_SEGMENTS), "Line segments"));
             enumParam->add(EnumDescription(Enum(POINTS), "Points"));
+            enumParam->add(EnumDescription(Enum(POLYGONS), "Polygons"));
             parameters.push_back(enumParam);
             
             uint32Param = new NumericParameter<UInt32>(SIZE_X);
@@ -387,6 +393,59 @@ namespace stromx
             }
             
             return matrix;
+        }
+
+        Data* TestDataOperator::polygons()
+        {
+            const int NUM_X_POLYGONS = 3;
+            const int NUM_Y_POLYGONS = 2;
+            
+            List* list = new List();
+            for (int i = 0; i < NUM_X_POLYGONS; ++i)
+            {
+                for (int j = 0; j < NUM_Y_POLYGONS; ++j)
+                {
+                    const int NUM_POINTS = 32;
+                    const int SIZE = 50;
+                    
+                    Matrix* matrix = 0;
+                    
+                    switch(m_dataType)
+                    {
+                    case MATRIX_FLOAT_32:
+                        matrix = new stromx::cvsupport::Matrix(NUM_POINTS, 2, Matrix::FLOAT_32);
+                        break;
+                    case MATRIX_FLOAT_64:
+                        matrix = new stromx::cvsupport::Matrix(NUM_POINTS, 2, Matrix::FLOAT_64);
+                        break;
+                    default:
+                        throw WrongArgument("Unsupported data type.");
+                    }
+                    
+                    float offsetX = (2*i + 1) * SIZE;
+                    float offsetY = (2*j + 1) * SIZE;
+                    
+                    for (int k = 0; k < NUM_POINTS; ++k)
+                    {
+                        const int NUM_PERIODS = 6;
+                        const int AMPLITUDE = 10;
+                        const float SPEED = 0.1;
+                        float radius = SIZE / 2 + AMPLITUDE * cos(m_index * SPEED)
+                                       * cos(2 * M_PI * k / NUM_POINTS * NUM_PERIODS);
+                        
+                        float angle = k * 2 * M_PI / NUM_POINTS;
+                        float x = radius * cos(angle);
+                        float y = radius * sin(angle);
+                        
+                        setMatrixEntry(matrix, k, 0, x + offsetX);
+                        setMatrixEntry(matrix, k, 1, y + offsetY);
+                    }
+                    
+                    list->content().push_back(matrix);
+                }
+            }
+            
+            return list;
         }
 
         void TestDataOperator::setMatrixEntry(Matrix* matrix, unsigned int row, 

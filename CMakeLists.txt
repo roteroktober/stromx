@@ -11,7 +11,7 @@ include(CheckTypeSize)
 check_type_size("float" FLOAT_SIZE)
 check_type_size("double" DOUBLE_SIZE)
 if(NOT FLOAT_SIZE EQUAL 4)
-    message(FATAL_ERROR "Float32 must be 4 bytes.")
+    message(FATAL_ERROR "Float must be 4 bytes.")
 endif()
 if(NOT DOUBLE_SIZE EQUAL 8)
     message(FATAL_ERROR "Double must be 8 bytes.")
@@ -46,13 +46,14 @@ include(UseDoxygen OPTIONAL)
 
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.50.0 REQUIRED COMPONENTS chrono filesystem locale regex serialization system thread)
+
+find_package(Boost 1.50.0 REQUIRED COMPONENTS chrono date_time filesystem locale regex serialization system thread timer)
 
 find_package(CppUnit)
 
 find_package(Threads)
 
-find_package(OpenCV COMPONENTS core imgproc highgui)
+find_package(OpenCV COMPONENTS calib3d core imgproc highgui)
 
 find_package(XercesC)
 
@@ -86,7 +87,7 @@ if (BUILD_OPENCV_WRAPPER AND BUILD_FILE_PERSISTENCE)
 endif()
 
 find_path(mmal_DIR "interface/mmal/mmal.h" HINTS /opt/vc/include)
-if (mmal_FOUND)
+if (mmal_DIR)
     option(BUILD_RASPI "Build raspi package" ON)
 endif()
 

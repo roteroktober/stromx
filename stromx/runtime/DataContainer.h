@@ -17,7 +17,6 @@
 #ifndef STROMX_RUNTIME_DATACONTAINER_H
 #define STROMX_RUNTIME_DATACONTAINER_H
 
-#include <ostream>
 #include "stromx/runtime/Config.h"
 
 #ifdef __GNUG__
@@ -31,7 +30,7 @@ namespace stromx
     namespace runtime
     {
         class Data;
-        class DataVariant;
+        class Variant;
         
         namespace impl
         {

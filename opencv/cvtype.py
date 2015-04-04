@@ -36,6 +36,16 @@ class Int(CvType):
     def typeId(self):
         return "int"
         
+class Color(CvType):
+    """
+    Native cv::Scalar with RGB entries.
+    """
+    def typeId(self):
+        return "cv::Scalar"
+    
+    def cast(self, src):
+        return "cv::Scalar({0}.r(), {0}.g(), {0}.b())".format(src)
+        
 class Float32(CvType):
     """
     Native C++ double type.
@@ -67,12 +77,29 @@ class Mat(CvType):
             return "cvsupport::getOpenCvMat({0}, {1})".format(src,
                                                               self.__channels)
         
+class Rect(CvType):
+    """
+    OpenCV cv::Rect type.
+    """        
+    def typeId(self):
+        return "cv::Rect"
+        
+class RotatedRect(CvType):
+    """
+    OpenCV cv::RotatedRect type.
+    """        
+    def typeId(self):
+        return "cv::RotatedRect"
+        
 class VectorOfMat(CvType):
     """
     OpenCV std::vector<cv::Mat> type.
     """
     def typeId(self):
         return "std::vector<cv::Mat>"
+    
+    def cast(self, src):
+        return "cvsupport::getOpenCvMatVector({0})".format(src)
         
 if __name__ == "__main__":
     import doctest

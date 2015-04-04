@@ -61,7 +61,7 @@ namespace stromx
             runtime::Float64 m_theta;
             runtime::UInt32 m_threshold;
             runtime::Enum m_dataFlow;
-            runtime::Description* m_dstDescription;
+            runtime::MatrixDescription* m_dstDescription;
             runtime::NumericParameter<runtime::Float64>* m_maxLineGapParameter;
             runtime::NumericParameter<runtime::Float64>* m_minLineLengthParameter;
             runtime::NumericParameter<runtime::Float64>* m_rhoParameter;
@@ -70,7 +70,7 @@ namespace stromx
             runtime::NumericParameter<runtime::UInt32>* m_thresholdParameter;
             runtime::EnumParameter* m_dataFlowParameter;
         };
-    }
-}
+    } // cvimgproc
+} // stromx
 
 #endif // STROMX_CVIMGPROC_HOUGHLINESP_H

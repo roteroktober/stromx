@@ -6,8 +6,12 @@ import package
 
 import rulegenerator
 import testgenerator
+
+class ArgumentVisitorBase(interface.ArgumentVisitor):
+    def visitReturnValue(self, retValue):
+        self.visitAllocation(retValue)
     
-class SingleArgumentVisitor(interface.ArgumentVisitor):
+class SingleArgumentVisitor(ArgumentVisitorBase):
     """
     Visitor which handles compound arguments and calls the accept methods
     of each component of the compound arguments. I.e. derived visitors do not
@@ -16,7 +20,8 @@ class SingleArgumentVisitor(interface.ArgumentVisitor):
     """
     def visitCompound(self, compound):
         for arg in compound.args:
-            arg.accept(self)
+            if not arg is None:
+                arg.accept(self)
             
     
 class CollectVisitor(SingleArgumentVisitor):
@@ -143,8 +148,8 @@ class MethodGenerator(object):
         """
         Exits the package namespace.
         """
-        self.doc.namespaceExit()
-        self.doc.namespaceExit()
+        self.doc.namespaceExit(self.p.ident)
+        self.doc.namespaceExit("stromx")
         self.doc.blank()
             
 class OpHeaderGenerator(MethodGenerator):
@@ -398,6 +403,7 @@ class OpImplGenerator(MethodGenerator):
         def export(self, doc):
             for i, p in enumerate(self.params):
                 defaultValue = p.default if p.default != None else ""
+                defaultValue = document.pythonToCpp(defaultValue)
                 init = "{0}({1})".format(p.ident.attribute(), defaultValue)
                 if i != len(self.params) - 1:
                     doc.line("{0},".format(init))
@@ -422,13 +428,13 @@ class OpImplGenerator(MethodGenerator):
             if parameter.argType == package.ArgType.PLAIN:
                 pass
             elif parameter.argType == package.ArgType.ENUM:
-                l = ("checkEnumValue(castedValue, {0}Parameter, *this);"
+                l = ("cvsupport::checkEnumValue(castedValue, {0}Parameter, *this);"
                     ).format(parameter.ident.attribute())
             elif parameter.argType == package.ArgType.NUMERIC:
-                l = ("checkNumericValue(castedValue, {0}Parameter, *this);"
+                l = ("cvsupport::checkNumericValue(castedValue, {0}Parameter, *this);"
                     ).format(parameter.ident.attribute())
             elif parameter.argType == package.ArgType.MATRIX:
-                l = ("checkMatrixValue(castedValue, {0}Parameter, *this);"
+                l = ("cvsupport::checkMatrixValue(castedValue, {0}Parameter, *this);"
                     ).format(parameter.ident.attribute())
             else:
                 assert(False)
@@ -574,19 +580,41 @@ class OpImplGenerator(MethodGenerator):
             self.visitOutput(arg)
             
         def visitOutput(self, output):
-            l = "runtime::Description* {0} = new runtime::Description({1}, {2});"\
-                .format(output.ident, output.ident.constant(),
-                        output.dataType.variant())
-            self.doc.line(l)
-            l = '{0}->setTitle(L_("{1}"));'\
-                .format(output.ident, output.name)
-            self.doc.line(l)
-            l = "outputs.push_back({0});".format(output.ident)
-            self.doc.line(l)
-            self.doc.blank()
+            if output.argType == package.ArgType.PLAIN:
+                self.__setupDescription(output)
+            elif output.argType == package.ArgType.MATRIX:
+                self.__setupMatrixDescription(output)
+            else:
+                assert(False)
         
         def visitAllocation(self, allocation):
             self.visitOutput(allocation)
+            
+        def __setupDescription(self, arg):
+            l = "runtime::Description* {0} = new runtime::Description({1}, {2});"\
+                .format(arg.ident, arg.ident.constant(),
+                        arg.dataType.variant())
+            self.doc.line(l)
+            l = '{0}->setTitle(L_("{1}"));'.format(arg.ident, arg.name)
+            self.doc.line(l)
+            l = "outputs.push_back({0});".format(arg.ident)
+            self.doc.line(l)
+            self.doc.blank()
+            
+        def __setupMatrixDescription(self, arg):
+            l = "runtime::MatrixDescription* {0} = new runtime::MatrixDescription({1}, {2});"\
+                .format(arg.ident, arg.ident.constant(),
+                        arg.dataType.variant())
+            self.doc.line(l)
+            l = '{0}->setTitle(L_("{1}"));'.format(arg.ident, arg.name)
+            self.doc.line(l)
+            l = '{0}->setRows({1});'.format(arg.ident, arg.rows)
+            self.doc.line(l)
+            l = '{0}->setCols({1});'.format(arg.ident, arg.cols)
+            self.doc.line(l)
+            l = "outputs.push_back({0});".format(arg.ident)
+            self.doc.line(l)
+            self.doc.blank()
             
     class SetupInputsVisitor(MethodGenerator.DocVisitor):
         """
@@ -644,7 +672,7 @@ class OpImplGenerator(MethodGenerator):
             
         def __getVariant(self, arg, isOutput):
             if isOutput:
-                return arg.dataType.parentVariant()
+                return arg.dataType.canBeCreatedFromVariant()
             else:
                 return arg.dataType.variant()
             
@@ -845,7 +873,7 @@ class OpImplGenerator(MethodGenerator):
         def __visit(self, arg):
             if arg.argType == package.ArgType.MATRIX:
                 l = (
-                    "checkMatrixData(*{0}CastedData, {1}Description, *this);"
+                    "cvsupport::checkMatrixValue(*{0}CastedData, {1}Description, *this);"
                 ).format(arg.ident, arg.ident.attribute())
                 self.doc.line(l)
             else:
@@ -853,14 +881,21 @@ class OpImplGenerator(MethodGenerator):
     
     class InitInVisitor(MethodGenerator.DocVisitor):
         """
-        Exports the initialization of the output argument before the OpenCV
+        Exports the initialization of the argument before the OpenCV
         function is called.
         """
+        def visitConstant(self, arg):
+            self.__visit(arg)
+            
         def visitInputOutput(self, arg):
-            self.visitOutput(arg)
+            self.__visit(arg)
             
         def visitOutput(self, output):
-            self.doc.document(output.initIn)
+            self.__visit(output)
+            
+        def __visit(self, arg):
+            self.doc.document(arg.initIn)
+        
             
     class CvDataVisitor(MethodGenerator.DocVisitor):
         """
@@ -914,7 +949,7 @@ class OpImplGenerator(MethodGenerator):
             rhs = "{0}CvData".format(refInput.refArg.ident)
             self.doc.line("{0} = {1};".format(cvData, rhs))
             
-    class MethodArgumentVisitor(interface.ArgumentVisitor):
+    class MethodArgumentVisitor(ArgumentVisitorBase):
         """
         Exports the argument of the OpenCV function for each visited argument.
         """
@@ -937,10 +972,15 @@ class OpImplGenerator(MethodGenerator):
             self.visit(parameter)
             
         def visitConstant(self, constant):
-            self.args.append(constant.value)
+            value = constant.value
+            value = document.pythonToCpp(value)
+            self.args.append(str(value))
             
         def visitRefInput(self, refInput):
             self.visit(refInput)
+            
+        def visitReturnValue(self, retValue):
+            pass
             
         def visit(self, arg):
             self.args.append("{0}CvData".format(arg.ident))
@@ -956,6 +996,19 @@ class OpImplGenerator(MethodGenerator):
                     argStr += ", "
             return argStr
             
+    class MethodReturnValueVisitor(ArgumentVisitorBase):
+        """
+        Exports the return value of the OpenCV function out of each visited argument.
+        """
+        def __init__(self):
+            self.returnValue = ""
+            
+        def visitReturnValue(self, retVal):
+            self.returnValue = "{0}CvData = ".format(retVal.ident)
+            
+        def export(self):
+            return self.returnValue
+            
     class OutDataVisitor(MethodGenerator.DocVisitor):
         """
         Exports the wrapping of the result data into a data container for
@@ -965,24 +1018,24 @@ class OpImplGenerator(MethodGenerator):
             self.visitOutput(arg)
             
         def visitOutput(self, output):
-            l = "runtime::DataContainer outContainer = inContainer;";
+            l = "runtime::DataContainer {0}OutContainer = inContainer;".format(output.ident)
             self.doc.line(l)
-            l = ("runtime::Id2DataPair outputMapper({0}, "
-                 "outContainer);").format(output.ident.constant());
+            l = ("runtime::Id2DataPair {0}OutMapper({1}, "
+                 "{0}OutContainer);").format(output.ident, output.ident.constant());
             self.doc.line(l)
             
         def visitAllocation(self, allocation):
             dataType = allocation.dataType.typeId()
             ident = allocation.ident
             cvData = "{0}CvData".format(ident)
-            cast = allocation.dataType.cast(cvData)
-            l = "{0}* {1}CastedData = new {2};".format(dataType, ident, cast)
+            newObject = allocation.dataType.allocate(cvData)
+            l = "{0}* {1}CastedData = {2};".format(dataType, ident, newObject)
             self.doc.line(l)
-            l = ("runtime::DataContainer outContainer = "
+            l = ("runtime::DataContainer {0}OutContainer = "
                  "runtime::DataContainer({0}CastedData);").format(ident)
             self.doc.line(l)
-            l = ("runtime::Id2DataPair outputMapper({0}, "
-                 "outContainer);").format(allocation.ident.constant());
+            l = ("runtime::Id2DataPair {0}OutMapper({1}, "
+                 "{0}OutContainer);").format(ident, allocation.ident.constant())
             self.doc.line(l)
         
     class InitOutVisitor(MethodGenerator.DocVisitor):
@@ -992,6 +1045,32 @@ class OpImplGenerator(MethodGenerator):
         """
         def visitAllocation(self, allocation):
             self.doc.document(allocation.initOut)
+            
+    class SendOutputDataVisitor(SingleArgumentVisitor):
+        """
+        Exports the send output command for all visited outputs.
+        """
+        def __init__(self):
+            self.line = ""
+            
+        def visitAllocation(self, output):
+            self.__visit(output)
+            
+        def visitOutput(self, output):
+            self.__visit(output)
+            
+        def visitInputOutput(self, arg):
+            self.__visit(arg)
+            
+        def export(self, doc):
+            if self.line != "":
+                doc.line("provider.sendOutputData({0});".format(self.line))
+            
+        def __visit(self, arg):
+            if self.line == "":
+                self.line = "{0}OutMapper".format(arg.ident)
+            else:
+                self.line += " && {0}OutMapper".format(arg.ident)
                 
     class EnumConversionDefVisitor(MethodGenerator.DocVisitor):
         """
@@ -1060,13 +1139,14 @@ class OpImplGenerator(MethodGenerator):
         self.doc.line('#include <stromx/runtime/Id2DataComposite.h>')
         self.doc.line('#include <stromx/runtime/Id2DataPair.h>')
         self.doc.line('#include <stromx/runtime/ReadAccess.h>')
+        self.doc.line('#include <stromx/runtime/VariantComposite.h>')
         self.doc.line('#include <stromx/runtime/WriteAccess.h>')
         self.doc.line('#include <opencv2/{0}/{0}.hpp>'.format(cvModule))
         self.doc.blank()    
         
     def __statics(self):
         method = self.m.ident.className()
-        package = self.p.ident.constant()
+        package = self.p.ident.upper()
         self.doc.line(("const std::string {0}::PACKAGE(STROMX_{1}_PACKAGE_"
                        "NAME);").format(method, package))
         self.doc.line(("const runtime::Version {0}::VERSION("
@@ -1303,16 +1383,20 @@ class OpImplGenerator(MethodGenerator):
             
             self.doc.blank()
             
+            v = OpImplGenerator.MethodReturnValueVisitor()   
+            self.visitOption(o, v)
+            retVal = v.export()
+            
             v = OpImplGenerator.MethodArgumentVisitor()   
             self.visitOption(o, v)
-            
             argStr = v.export()
+            
             namespace = ""
             if self.m.namespace != "":
                 namespace = "{0}::".format(self.m.namespace)
                 
-            self.doc.line("{2}{0}({1});".format(self.m.ident, argStr,
-                                                namespace))
+            self.doc.line("{3}{2}{0}({1});".format(self.m.ident, argStr,
+                                                   namespace, retVal))
             if o.postCall != None:
                 self.doc.document(o.postCall)
                 
@@ -1326,8 +1410,9 @@ class OpImplGenerator(MethodGenerator):
             v = OpImplGenerator.InitOutVisitor(self.doc)
             self.visitOption(o, v)
             
-            l = "provider.sendOutputData(outputMapper);";
-            self.doc.line(l)
+            v = OpImplGenerator.SendOutputDataVisitor()
+            self.visitOption(o, v)
+            v.export(self.doc)
                 
             self.doc.scopeExit()
             self.doc.line("break;")
@@ -1514,7 +1599,7 @@ class OpTestImplGenerator(MethodGenerator, OpTestGenerator):
                                                         self.m.ident.className())
         with file(filename, "w") as f:
             f.write(self.doc.string())
-        
+            
 def generateMethodFiles(package, method):
     """
     Generates the operator and the operator tests for the given method.

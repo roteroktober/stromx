@@ -24,10 +24,12 @@ set(SOURCES
     ConvertPixelType.cpp
     ConstImage.cpp
     DummyCamera.cpp
+    Flicker.cpp
     Image.cpp
     Cvsupport.cpp
     Matrix.cpp
     Utilities.cpp
+    ReadDirectory.cpp
     impl/CameraBuffer.cpp
 )
 

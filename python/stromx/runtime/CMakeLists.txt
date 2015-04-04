@@ -4,11 +4,11 @@ set(SOURCES
     Color.cpp
     Data.cpp
     DataContainer.cpp
-    DataVariant.cpp
     Description.cpp
     Exception.cpp
     ExceptionObserver.cpp
     Factory.cpp
+    File.cpp
     Image.cpp
     InputProvider.cpp
     Connector.cpp
@@ -30,6 +30,9 @@ set(SOURCES
     SortInputsAlgorithm.cpp
     Thread.cpp
     TriggerData.cpp
+    Variant.cpp
+    VariantHandle.cpp
+    VariantInterface.cpp
     Version.cpp
     WriteAccess.cpp
 )

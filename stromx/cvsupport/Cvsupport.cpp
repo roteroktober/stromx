@@ -20,9 +20,11 @@
 #include "stromx/cvsupport/Clip.h"
 #include "stromx/cvsupport/ConstImage.h"
 #include "stromx/cvsupport/ConvertPixelType.h"
+#include "stromx/cvsupport/Cvsupport.h"
+#include "stromx/cvsupport/Flicker.h"
 #include "stromx/cvsupport/Image.h"
 #include "stromx/cvsupport/Matrix.h"
-#include "stromx/cvsupport/Cvsupport.h"
+#include "stromx/cvsupport/ReadDirectory.h"
 #include <stromx/runtime/Exception.h>
 #include <stromx/runtime/Locale.h>
 #include <stromx/runtime/Registry.h>
@@ -51,4 +53,6 @@ void stromxCvsupportRegister(stromx::runtime::Registry& registry)
     registry.registerOperator(new Clip);
     registry.registerOperator(new ConstImage);
     registry.registerOperator(new ConvertPixelType);
+    registry.registerOperator(new Flicker);
+    registry.registerOperator(new ReadDirectory);
 }

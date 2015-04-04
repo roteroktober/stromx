@@ -21,7 +21,9 @@
 #include <stromx/runtime/Counter.h>
 #include <stromx/runtime/Dump.h>
 #include <stromx/runtime/Fork.h>
+#include <stromx/runtime/Iterate.h>
 #include <stromx/runtime/Join.h>
+#include <stromx/runtime/Merge.h>
 #include <stromx/runtime/PeriodicDelay.h>
 #include <stromx/runtime/Queue.h>
 #include <stromx/runtime/Receive.h>
@@ -34,10 +36,10 @@ void exportFactory();
 void exportColor();
 void exportData();
 void exportDataContainer();
-void exportDataVariant();
 void exportDescription();
 void exportException();
 void exportExceptionObserver();
+void exportFile();
 void exportImage();
 void exportInputProvider();
 void exportConnector();
@@ -59,6 +61,9 @@ void exportStream();
 void exportString();
 void exportThread();
 void exportTriggerData();
+void exportVariant();
+void exportVariantHandle();
+void exportVariantInterface();
 void exportVersion();
 void exportWriteAccess();
 void exportXmlReader();
@@ -75,10 +80,10 @@ BOOST_PYTHON_MODULE(libruntime)
     exportColor();
     exportData();
     exportDataContainer();
-    exportDataVariant();
     exportDescription();
     exportException();
     exportExceptionObserver();
+    exportFile();
     exportMatrix();
     exportImage();
     exportInputProvider();
@@ -100,7 +105,10 @@ BOOST_PYTHON_MODULE(libruntime)
     exportStream();
     exportString();
     exportThread();
+    exportVariantInterface();
+    exportVariantHandle();
     exportTriggerData();
+    exportVariant();
     exportVersion();    
     exportWriteAccess();
     exportXmlReader();
@@ -111,7 +119,9 @@ BOOST_PYTHON_MODULE(libruntime)
     stromx::python::exportOperatorKernel<Queue>("Queue");
     stromx::python::exportOperatorKernel<Counter>("Counter");
     stromx::python::exportOperatorKernel<Fork>("Fork");
+    stromx::python::exportOperatorKernel<Iterate>("Iterate");
     stromx::python::exportOperatorKernel<Join>("Join");
+    stromx::python::exportOperatorKernel<Merge>("Merge");
     stromx::python::exportOperatorKernel<PeriodicDelay>("PeriodicDelay");
     stromx::python::exportOperatorKernel<Receive>("Receive");
     stromx::python::exportOperatorKernel<Send>("Send");

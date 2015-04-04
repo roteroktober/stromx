@@ -16,22 +16,23 @@ if(BUILD_FILE_PERSISTENCE)
     include_directories(${LIBZIP_INCLUDE_DIR})
 endif()
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/archive.zip DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/dtd.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/invalid.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})  
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/invalid.zip DESTINATION ${CMAKE_CURRENT_BINARY_DIR})     
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/nonsense.stromx DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/parameters.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/parameters.zip DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/parameters.stromx DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/stream.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/stream.zip DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/stream.stromx DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/double_matrix.npy DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/empty_float_matrix.npy DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/fortran_order.npy DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/uint16_matrix.npy DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/archive.zip ${CMAKE_CURRENT_BINARY_DIR}/archive.zip COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/data.txt ${CMAKE_CURRENT_BINARY_DIR}/data.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dtd.xml ${CMAKE_CURRENT_BINARY_DIR}/dtd.xml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/invalid.xml ${CMAKE_CURRENT_BINARY_DIR}/invalid.xml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/invalid.zip ${CMAKE_CURRENT_BINARY_DIR}/invalid.zip COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nonsense.stromx ${CMAKE_CURRENT_BINARY_DIR}/nonsense.stromx COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/parameters.xml ${CMAKE_CURRENT_BINARY_DIR}/parameters.xml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/parameters.zip ${CMAKE_CURRENT_BINARY_DIR}/parameters.zip COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/parameters.stromx ${CMAKE_CURRENT_BINARY_DIR}/parameters.stromx COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/stream.xml ${CMAKE_CURRENT_BINARY_DIR}/stream.xml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/stream.zip ${CMAKE_CURRENT_BINARY_DIR}/stream.zip COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/stream.stromx ${CMAKE_CURRENT_BINARY_DIR}/stream.stromx COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/double_matrix.npy ${CMAKE_CURRENT_BINARY_DIR}/double_matrix.npy COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/empty_float_matrix.npy ${CMAKE_CURRENT_BINARY_DIR}/empty_float_matrix.npy COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/fortran_order.npy ${CMAKE_CURRENT_BINARY_DIR}/fortran_order.npy COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/uint16_matrix.npy ${CMAKE_CURRENT_BINARY_DIR}/uint16_matrix.npy COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/data.txt ${CMAKE_CURRENT_BINARY_DIR}/directory/data.txt COPYONLY)
 
 set(SOURCES
     ../Block.cpp
@@ -44,23 +45,25 @@ set(SOURCES
     ../Data.cpp
     ../DataRef.cpp
     ../DataContainer.cpp
-    ../DataVariant.cpp
     ../Description.cpp
     ../Dump.cpp
     ../Enum.cpp
     ../EnumParameter.cpp
     ../Exception.cpp
     ../Factory.cpp
+    ../File.cpp
     ../Fork.cpp
     ../Join.cpp
     ../Id2DataComposite.cpp
     ../Id2DataPair.cpp
     ../Image.cpp
     ../ImageWrapper.cpp
+    ../Iterate.cpp
     ../List.cpp
     ../Locale.cpp
     ../Matrix.cpp
     ../MatrixWrapper.cpp
+    ../Merge.cpp
     ../None.cpp
     ../Operator.cpp
     ../OperatorKernel.cpp
@@ -78,6 +81,10 @@ set(SOURCES
     ../String.cpp
     ../TriggerData.cpp
     ../Try.cpp
+    ../Variant.cpp
+    ../VariantComposite.cpp
+    ../VariantInterface.cpp
+    ../VariantHandle.cpp
     ../Version.cpp
     ../impl/Client.cpp
     ../impl/DataContainerImpl.cpp
@@ -99,12 +106,12 @@ set(SOURCES
     CounterTest.cpp
     DataContainerTest.cpp
     DataRefTest.cpp
-    DataVariantTest.cpp
     DataTest.cpp
     DumpTest.cpp
     EnumTest.cpp
     ExceptionOperator.cpp
     ExceptionTest.cpp
+    FileTest.cpp
     Float64Test.cpp
     ForkTest.cpp
     Id2DataCompositeTest.cpp
@@ -113,9 +120,11 @@ set(SOURCES
     ImageWrapperTest.cpp
     InputNodeTest.cpp
     Int32Test.cpp
+    IterateTest.cpp
     JoinTest.cpp
     ListTest.cpp
     MatrixWrapperTest.cpp
+    MergeTest.cpp
     OperatorKernelTest.cpp
     OperatorTest.cpp
     OutputNodeTest.cpp
@@ -139,6 +148,7 @@ set(SOURCES
     StreamTest.cpp
     TestUtilities.cpp
     UInt8Test.cpp
+    VariantTest.cpp
     VersionTest.cpp
     WriteAccessTest.cpp
     main.cpp

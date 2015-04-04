@@ -1,5 +1,6 @@
 #include "stromx/cvcore/test/Bitwise_notTest.h"
 
+#include <boost/lexical_cast.hpp>
 #include <stromx/runtime/OperatorException.h>
 #include <stromx/runtime/ReadAccess.h>
 #include "stromx/cvsupport/Image.h"
@@ -33,10 +34,10 @@ namespace stromx
             m_operator->setInputData(Bitwise_not::SRC_1, src1);
             m_operator->setInputData(Bitwise_not::DST, dst);
             
-            runtime::DataContainer result = m_operator->getOutputData(Bitwise_not::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(Bitwise_not::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("Bitwise_notTest_testManual0.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("Bitwise_notTest_testManual0_dst.png", dstAccess());
         }
         
         void Bitwise_notTest::testManual1()
@@ -51,10 +52,10 @@ namespace stromx
             m_operator->setInputData(Bitwise_not::SRC_1, src1);
             m_operator->setInputData(Bitwise_not::DST, dst);
             
-            runtime::DataContainer result = m_operator->getOutputData(Bitwise_not::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(Bitwise_not::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("Bitwise_notTest_testManual1.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("Bitwise_notTest_testManual1_dst.png", dstAccess());
         }
         
         void Bitwise_notTest::testAllocate0()
@@ -67,12 +68,12 @@ namespace stromx
             
             m_operator->setInputData(Bitwise_not::SRC_1, src1);
             
-            runtime::DataContainer result = m_operator->getOutputData(Bitwise_not::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(Bitwise_not::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("Bitwise_notTest_testAllocate0.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("Bitwise_notTest_testAllocate0_dst.png", dstAccess());
         }
         
-    }
-}
+    } // cvcore
+} // stromx
 

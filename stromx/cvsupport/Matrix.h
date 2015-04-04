@@ -26,6 +26,12 @@ namespace cv
 {
     class Mat;
     class MatExpr;
+    
+    template <class T>
+    class Rect_;
+    typedef Rect_<int> Rect;
+    
+    class RotatedRect;
 }
 
 namespace stromx
@@ -66,6 +72,19 @@ namespace stromx
             
             /** Copy constructs a matrix from \c matrix. */
             explicit Matrix(const stromx::runtime::Matrix& matrix);
+            
+            /** 
+             * Allocates a 1 x 4 matrix with 32-bit integer values and copies
+             * the (x, y, width, height) values from \c cvRect to it.
+             */
+            explicit Matrix(const cv::Rect& cvRect);
+            
+            /** 
+             * Allocates a 1 x 5 matrix with 32-bit float values and copies the
+             * (centerX, centerY, width, height, angle) of \c cvRotatedRect to
+             * it.
+             */
+            explicit Matrix(const cv::RotatedRect& cvRotatedRect);
             
             /** 
              * Allocates a matrix with a buffer of a given size in bytes. The matrix has 1 row and

@@ -21,16 +21,18 @@ class DataType(object):
         """
         return self.typeId()
         
-    def parentVariant(self):
+    def canBeCreatedFromVariant(self):
         """
-        Returns the most general variant corresponding to this data type, e.g.
-        "runtime::DataVariant::MATRIX" for the data type Float32Matrix.
+        Returns the most general variant of objects which can be converted to
+        objects of this type. E.g. any MATRIX can be initialized to a
+        FLOAT_32_MATRIX (without preserving its data) provided that its memory
+        is large enough to hold the new object.
         """
         return self.variant()
         
     def variant(self):
         """
-        Returns the variant of the type, e.g. "runtime::DataVariant::BOOL".
+        Returns the variant of the type, e.g. "runtime::Variant::BOOL".
         """
         raise NotImplementedError()
         
@@ -41,6 +43,13 @@ class DataType(object):
         """
         return "{0}({1})".format(self.concreteTypeId(), src)
         
+    def allocate(self, src):
+        """
+        Returns an allocation on the stack of type which is initialized by the 
+        input variable.
+        """
+        return "new {0}".format(self.cast(src))
+        
 class Bool(DataType):
     """
     Stromx runtime::Bool type.
@@ -49,7 +58,27 @@ class Bool(DataType):
         return "runtime::Bool"
         
     def variant(self):
-        return "runtime::DataVariant::BOOL"
+        return "runtime::Variant::BOOL"
+        
+class UInt8(DataType):
+    """
+    Stromx runtime::UInt8 type.
+    """
+    def typeId(self):
+        return "runtime::UInt8"
+        
+    def variant(self):
+        return "runtime::Variant::UINT_8"
+        
+class Int32(DataType):
+    """
+    Stromx runtime::Int32 type.
+    """
+    def typeId(self):
+        return "runtime::Int32"
+        
+    def variant(self):
+        return "runtime::Variant::INT_32"
         
 class UInt32(DataType):
     """
@@ -59,7 +88,7 @@ class UInt32(DataType):
         return "runtime::UInt32"
         
     def variant(self):
-        return "runtime::DataVariant::UINT_32"
+        return "runtime::Variant::UINT_32"
         
 class Float32(DataType):
     """
@@ -69,7 +98,7 @@ class Float32(DataType):
         return "runtime::Float32"
         
     def variant(self):
-        return "runtime::DataVariant::FLOAT_32"
+        return "runtime::Variant::FLOAT_32"
         
 class Float64(DataType):
     """
@@ -79,7 +108,7 @@ class Float64(DataType):
         return "runtime::Float64"
         
     def variant(self):
-        return "runtime::DataVariant::FLOAT_64"
+        return "runtime::Variant::FLOAT_64"
         
 class Enum(DataType):
     """
@@ -89,14 +118,14 @@ class Enum(DataType):
         return "runtime::Enum"
         
     def variant(self):
-        return "runtime::DataVariant::ENUM"
+        return "runtime::Variant::ENUM"
         
 class Image(DataType):
     """
     Stromx runtime::Image type. Uses the implementation cvsupport::Image to cast
     input data to an runtime::Image object.
     """
-    def __init__(self, variant = "runtime::DataVariant::IMAGE"):
+    def __init__(self, variant = "runtime::Variant::IMAGE"):
         self.__variant = variant
         
     def typeId(self):
@@ -104,9 +133,6 @@ class Image(DataType):
         
     def concreteTypeId(self):
         return "cvsupport::Image"
-        
-    def parentVariant(self):
-        return "runtime::DataVariant::IMAGE"
         
     def variant(self):
         return self.__variant
@@ -116,7 +142,7 @@ class Matrix(DataType):
     Stromx runtime::Image type. Uses the implementation cvsupport::Matrix to cast
     input data to an runtime::Matrix object.
     """
-    def __init__(self, variant = "runtime::DataVariant::MATRIX"):
+    def __init__(self, variant = "runtime::Variant::MATRIX"):
         self.__variant = variant
         
     def typeId(self):
@@ -125,24 +151,39 @@ class Matrix(DataType):
     def concreteTypeId(self):
         return "cvsupport::Matrix"
         
-    def parentVariant(self):
-        return "runtime::DataVariant::MATRIX"
+    def canBeCreatedFromVariant(self):
+        return "runtime::Variant::MATRIX"
         
     def variant(self):
         return self.__variant
     
+class IntMatrix(Matrix):
+    def __init__(self):
+        super(IntMatrix, self).__init__("runtime::Variant::INT_MATRIX")
+    
+class Int32Matrix(Matrix):
+    def __init__(self):
+        super(Int32Matrix, self).__init__("runtime::Variant::INT_32_MATRIX")
+    
 class FloatMatrix(Matrix):
     def __init__(self):
-        super(FloatMatrix, self).__init__("runtime::DataVariant::FLOAT_MATRIX")
+        super(FloatMatrix, self).__init__("runtime::Variant::FLOAT_MATRIX")
     
 class Float32Matrix(Matrix):
     def __init__(self):
-        super(Float32Matrix, self).__init__("runtime::DataVariant::FLOAT_32_MATRIX")
+        super(Float32Matrix, self).__init__("runtime::Variant::FLOAT_32_MATRIX")
     
 class Float64Matrix(Matrix):
     def __init__(self):
-        super(Float32Matrix, self).__init__("runtime::DataVariant::FLOAT_64_MATRIX")
-        
+        super(Float64Matrix, self).__init__("runtime::Variant::FLOAT_64_MATRIX")
+    
+class Any32BitMatrix(Matrix):
+    def __init__(self):
+        super(Any32BitMatrix, self).__init__(
+            "runtime::Variant::INT_32_MATRIX || "
+            "runtime::Variant::FLOAT_32_MATRIX"
+        )
+    
 class List(DataType):
     """
     Stromx runtime::List type.
@@ -153,11 +194,11 @@ class List(DataType):
     def typeId(self):
         return "runtime::List"
         
-    def parentVariant(self):
-        return "runtime::DataVariant::Data"
+    def canBeCreatedFromVariant(self):
+        return "runtime::Variant::Data"
         
     def variant(self):
-        return "runtime::DataVariant::LIST"
+        return "runtime::Variant::LIST"
         
     def cast(self, src):
         return "runtime::TypedList<{1}>({0})".format(src,

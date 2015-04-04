@@ -159,9 +159,9 @@ class Scalar(Compound):
         self.args = [arg0, arg1, arg2, arg3]
         
     def create(self):
-        cvData = ["{0}".format(self.arg.ident) for arg in self.args 
-                  if self.args != None]
-        argString = ",".join(cvData)
+        cvData = ["{0}CvData".format(arg.ident) for arg in self.args 
+                  if arg != None]
+        argString = ", ".join(cvData)
         
         return "cv::Scalar({0})".format(argString)
         
@@ -214,13 +214,14 @@ class Argument(Acceptor):
         
 class MatrixArgument(Argument):
     """
-    Input argument which is represented by a matrix parameter.
+    Input argument which is represented by a matrix argument.
     """
     def __init__(self, ident, name, cvType, dataType, rows = 0,
-                 cols = 0, rules = None):
+                 cols = 0, rules = None, initIn = None, initOut = None):
         super(MatrixArgument, self).__init__(
             ident, name, cvType, dataType, rules = rules, 
-            argType = ArgType.MATRIX, rows = rows, cols = cols
+            argType = ArgType.MATRIX, rows = rows, cols = cols, 
+            initIn = initIn, initOut = initOut
         )
     
 class InputArgument(Argument):
@@ -330,7 +331,8 @@ class Constant(Argument):
     Constant method argument which can not be set as input or parameter. The
     value must be fixed at compile time.
     """
-    def __init__(self, value):
+    def __init__(self, value, initIn = None):
+        self.initIn = initIn
         self.ident = Ident()
         self.value = value
     
@@ -355,9 +357,10 @@ class Output(OutputArgument):
     forwarded to the output. It represents the only input data among all other
     inputs of the operation which is changed by the method.
     """
-    def __init__(self, arg):
+    def __init__(self, arg, isReturnValue = False):
         if arg:
             self.copyFrom(arg)
+        self.isReturnValue = isReturnValue
     
     def accept(self, visitor):
         visitor.visitOutput(self)
@@ -398,6 +401,18 @@ class Allocation(OutputArgument):
     
     def accept(self, visitor):
         visitor.visitAllocation(self)
+        
+class ReturnValue(Allocation):
+    """
+    Virtual operator output which corresponds to the return value of the OpenCV
+    function. It is not visible as input but its data is allocated during
+    execution. The data then is passed to the output.
+    """
+    def __init__(self, arg):
+        self.copyFrom(arg)
+    
+    def accept(self, visitor):
+        visitor.visitReturnValue(self)
 
 class EnumDescription(object):
     """

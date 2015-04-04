@@ -1,5 +1,6 @@
 #include "stromx/cvcore/test/AddWeightedTest.h"
 
+#include <boost/lexical_cast.hpp>
 #include <stromx/runtime/OperatorException.h>
 #include <stromx/runtime/ReadAccess.h>
 #include "stromx/cvsupport/Image.h"
@@ -35,10 +36,10 @@ namespace stromx
             m_operator->setInputData(AddWeighted::SRC_2, src2);
             m_operator->setInputData(AddWeighted::DST, dst);
             
-            runtime::DataContainer result = m_operator->getOutputData(AddWeighted::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(AddWeighted::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("AddWeightedTest_testManual0.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("AddWeightedTest_testManual0_dst.png", dstAccess());
         }
         
         void AddWeightedTest::testManual1()
@@ -61,10 +62,10 @@ namespace stromx
             m_operator->setParameter(AddWeighted::GAMMA, gamma);
             m_operator->setInputData(AddWeighted::DST, dst);
             
-            runtime::DataContainer result = m_operator->getOutputData(AddWeighted::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(AddWeighted::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("AddWeightedTest_testManual1.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("AddWeightedTest_testManual1_dst.png", dstAccess());
         }
         
         void AddWeightedTest::testManual2()
@@ -89,10 +90,10 @@ namespace stromx
             m_operator->setInputData(AddWeighted::DST, dst);
             m_operator->setParameter(AddWeighted::DDEPTH, ddepth);
             
-            runtime::DataContainer result = m_operator->getOutputData(AddWeighted::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(AddWeighted::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("AddWeightedTest_testManual2.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("AddWeightedTest_testManual2_dst.png", dstAccess());
         }
         
         void AddWeightedTest::testAllocate0()
@@ -113,10 +114,10 @@ namespace stromx
             m_operator->setParameter(AddWeighted::BETA, beta);
             m_operator->setParameter(AddWeighted::GAMMA, gamma);
             
-            runtime::DataContainer result = m_operator->getOutputData(AddWeighted::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(AddWeighted::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("AddWeightedTest_testAllocate0.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("AddWeightedTest_testAllocate0_dst.png", dstAccess());
         }
         
         void AddWeightedTest::testAllocate1()
@@ -139,12 +140,12 @@ namespace stromx
             m_operator->setParameter(AddWeighted::GAMMA, gamma);
             m_operator->setParameter(AddWeighted::DDEPTH, ddepth);
             
-            runtime::DataContainer result = m_operator->getOutputData(AddWeighted::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(AddWeighted::DST);
             
-            runtime::ReadAccess<runtime::Image> access(result);
-            cvsupport::Image::save("AddWeightedTest_testAllocate1.png", access());
+            runtime::ReadAccess<runtime::Image> dstAccess(dstResult);
+            cvsupport::Image::save("AddWeightedTest_testAllocate1_dst.png", dstAccess());
         }
         
-    }
-}
+    } // cvcore
+} // stromx
 

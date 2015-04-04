@@ -27,7 +27,7 @@ namespace stromx
             m_operator->initialize();
             m_operator->activate();
             
-            runtime::DataContainer src(new cvsupport::Matrix("points_2d.npy"));
+            runtime::DataContainer src(new cvsupport::Matrix("points_f32.npy"));
             cvsupport::Matrix cameraMatrix("camera_matrix.npy");
             cvsupport::Matrix distCoeffs("dist_coeffs.npy");
             
@@ -35,10 +35,10 @@ namespace stromx
             m_operator->setParameter(UndistortPoints::CAMERA_MATRIX, cameraMatrix);
             m_operator->setParameter(UndistortPoints::DIST_COEFFS, distCoeffs);
             
-            runtime::DataContainer result = m_operator->getOutputData(UndistortPoints::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(UndistortPoints::DST);
             
-            runtime::ReadAccess<runtime::Matrix> access(result);
-            cvsupport::Matrix::save("UndistortPointsTest_testAllocate0.npy", access());
+            runtime::ReadAccess<runtime::Matrix> dstAccess(dstResult);
+            cvsupport::Matrix::save("UndistortPointsTest_testAllocate0_dst.npy", dstAccess());
         }
         
         void UndistortPointsTest::testAllocate1()
@@ -46,16 +46,16 @@ namespace stromx
             m_operator->initialize();
             m_operator->activate();
             
-            runtime::DataContainer src(new cvsupport::Matrix("points_2d.npy"));
+            runtime::DataContainer src(new cvsupport::Matrix("points_f32.npy"));
             
             m_operator->setInputData(UndistortPoints::SRC, src);
             
-            runtime::DataContainer result = m_operator->getOutputData(UndistortPoints::DST);
+            runtime::DataContainer dstResult = m_operator->getOutputData(UndistortPoints::DST);
             
-            runtime::ReadAccess<runtime::Matrix> access(result);
-            cvsupport::Matrix::save("UndistortPointsTest_testAllocate1.npy", access());
+            runtime::ReadAccess<runtime::Matrix> dstAccess(dstResult);
+            cvsupport::Matrix::save("UndistortPointsTest_testAllocate1_dst.npy", dstAccess());
         }
         
-    }
-}
+    } // cvimgproc
+} // stromx
 

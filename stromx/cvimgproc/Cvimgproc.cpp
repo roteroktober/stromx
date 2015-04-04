@@ -24,11 +24,22 @@
 #include "stromx/cvimgproc/FloodFill.h"
 #include "stromx/cvimgproc/Integral.h"
 #include "stromx/cvimgproc/CalcHist1D.h"
+#include "stromx/cvimgproc/FindContours.h"
+#include "stromx/cvimgproc/DrawContours.h"
+#include "stromx/cvimgproc/ApproxPolyDP.h"
+#include "stromx/cvimgproc/BoundingRect.h"
+#include "stromx/cvimgproc/ConvexHull.h"
+#include "stromx/cvimgproc/FitEllipse.h"
+#include "stromx/cvimgproc/FitLine.h"
+#include "stromx/cvimgproc/MinAreaRect.h"
+#include "stromx/cvimgproc/MinEnclosingCircle.h"
 #include "stromx/cvimgproc/Canny.h"
 #include "stromx/cvimgproc/CornerHarris.h"
 #include "stromx/cvimgproc/CornerMinEigenVal.h"
+#include "stromx/cvimgproc/CornerSubPix.h"
+#include "stromx/cvimgproc/GoodFeaturesToTrack.h"
 #include "stromx/cvimgproc/HoughLinesP.h"
-#include "stromx/cvimgproc/FindContours.h"
+#include "stromx/cvimgproc/PreCornerDetect.h"
 #include <stromx/runtime/Locale.h>
 #include <stromx/runtime/Registry.h>
 
@@ -70,9 +81,20 @@ void stromxCvimgprocRegister(stromx::runtime::Registry& registry)
     registry.registerOperator(new FloodFill);
     registry.registerOperator(new Integral);
     registry.registerOperator(new CalcHist1D);
+    registry.registerOperator(new FindContours);
+    registry.registerOperator(new DrawContours);
+    registry.registerOperator(new ApproxPolyDP);
+    registry.registerOperator(new BoundingRect);
+    registry.registerOperator(new ConvexHull);
+    registry.registerOperator(new FitEllipse);
+    registry.registerOperator(new FitLine);
+    registry.registerOperator(new MinAreaRect);
+    registry.registerOperator(new MinEnclosingCircle);
     registry.registerOperator(new Canny);
     registry.registerOperator(new CornerHarris);
     registry.registerOperator(new CornerMinEigenVal);
+    registry.registerOperator(new CornerSubPix);
+    registry.registerOperator(new GoodFeaturesToTrack);
     registry.registerOperator(new HoughLinesP);
-    registry.registerOperator(new FindContours);
+    registry.registerOperator(new PreCornerDetect);
 }

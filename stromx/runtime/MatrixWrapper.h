@@ -45,7 +45,7 @@ namespace stromx
             MatrixWrapper();
             
             // Implementation of stromx::runtime::Matrix
-            virtual const DataVariant & variant() const { return m_variant; }
+            virtual const VariantHandle & variant() const { return m_variant; }
             virtual uint8_t* buffer() { return m_buffer; }
             virtual unsigned int bufferSize() const { return m_bufferSize; }
             virtual unsigned int rows() const { return m_rows; }
@@ -59,8 +59,8 @@ namespace stromx
                                           const unsigned int stride, 
                                           uint8_t* data, 
                                           const ValueType valueType);
-            virtual void serialize(runtime::OutputProvider & output) const;
-            virtual void deserialize(runtime::InputProvider & input, const stromx::runtime::Version & version);
+            virtual void serialize(OutputProvider & output) const;
+            virtual void deserialize(InputProvider & input, const Version & version);
             
             /** Resizes the matrix and changes the value type of the matrix. */
             void resize(const unsigned int rows, const unsigned int cols, const ValueType valueType);
@@ -127,7 +127,7 @@ namespace stromx
             ValueType m_valueType;
             uint8_t* m_data;
             uint8_t* m_buffer;
-            DataVariant m_variant;
+            VariantHandle m_variant;
         };
     }
 }

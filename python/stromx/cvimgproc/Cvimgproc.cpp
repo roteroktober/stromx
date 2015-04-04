@@ -25,11 +25,22 @@
 #include <stromx/cvimgproc/FloodFill.h>
 #include <stromx/cvimgproc/Integral.h>
 #include <stromx/cvimgproc/CalcHist1D.h>
+#include <stromx/cvimgproc/FindContours.h>
+#include <stromx/cvimgproc/DrawContours.h>
+#include <stromx/cvimgproc/ApproxPolyDP.h>
+#include <stromx/cvimgproc/BoundingRect.h>
+#include <stromx/cvimgproc/ConvexHull.h>
+#include <stromx/cvimgproc/FitEllipse.h>
+#include <stromx/cvimgproc/FitLine.h>
+#include <stromx/cvimgproc/MinAreaRect.h>
+#include <stromx/cvimgproc/MinEnclosingCircle.h>
 #include <stromx/cvimgproc/Canny.h>
 #include <stromx/cvimgproc/CornerHarris.h>
 #include <stromx/cvimgproc/CornerMinEigenVal.h>
+#include <stromx/cvimgproc/CornerSubPix.h>
+#include <stromx/cvimgproc/GoodFeaturesToTrack.h>
 #include <stromx/cvimgproc/HoughLinesP.h>
-#include <stromx/cvimgproc/FindContours.h>
+#include <stromx/cvimgproc/PreCornerDetect.h>
 #include <python/stromx/runtime/ExportOperatorKernel.h>
 
 using namespace boost::python;
@@ -63,9 +74,20 @@ BOOST_PYTHON_MODULE(libcvimgproc)
     stromx::python::exportOperatorKernel<FloodFill>("FloodFill");
     stromx::python::exportOperatorKernel<Integral>("Integral");
     stromx::python::exportOperatorKernel<CalcHist1D>("CalcHist1D");
+    stromx::python::exportOperatorKernel<FindContours>("FindContours");
+    stromx::python::exportOperatorKernel<DrawContours>("DrawContours");
+    stromx::python::exportOperatorKernel<ApproxPolyDP>("ApproxPolyDP");
+    stromx::python::exportOperatorKernel<BoundingRect>("BoundingRect");
+    stromx::python::exportOperatorKernel<ConvexHull>("ConvexHull");
+    stromx::python::exportOperatorKernel<FitEllipse>("FitEllipse");
+    stromx::python::exportOperatorKernel<FitLine>("FitLine");
+    stromx::python::exportOperatorKernel<MinAreaRect>("MinAreaRect");
+    stromx::python::exportOperatorKernel<MinEnclosingCircle>("MinEnclosingCircle");
     stromx::python::exportOperatorKernel<Canny>("Canny");
     stromx::python::exportOperatorKernel<CornerHarris>("CornerHarris");
     stromx::python::exportOperatorKernel<CornerMinEigenVal>("CornerMinEigenVal");
+    stromx::python::exportOperatorKernel<CornerSubPix>("CornerSubPix");
+    stromx::python::exportOperatorKernel<GoodFeaturesToTrack>("GoodFeaturesToTrack");
     stromx::python::exportOperatorKernel<HoughLinesP>("HoughLinesP");
-    stromx::python::exportOperatorKernel<FindContours>("FindContours");
+    stromx::python::exportOperatorKernel<PreCornerDetect>("PreCornerDetect");
 }

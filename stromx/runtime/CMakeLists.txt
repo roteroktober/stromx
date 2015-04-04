@@ -34,23 +34,25 @@ set(SOURCES
     DataContainer.cpp
     Data.cpp
     DataRef.cpp
-    DataVariant.cpp
     Description.cpp
     Dump.cpp
     Enum.cpp
     EnumParameter.cpp
     Exception.cpp
     Factory.cpp
+    File.cpp
     Fork.cpp
     Id2DataComposite.cpp
     Id2DataPair.cpp
     Image.cpp
     ImageWrapper.cpp
+    Iterate.cpp
     Join.cpp
     List.cpp
     Locale.cpp
     Matrix.cpp
     MatrixWrapper.cpp
+    Merge.cpp
     None.cpp
     Operator.cpp
     OperatorKernel.cpp
@@ -69,6 +71,10 @@ set(SOURCES
     Thread.cpp
     TriggerData.cpp
     Try.cpp
+    Variant.cpp
+    VariantComposite.cpp
+    VariantHandle.cpp
+    VariantInterface.cpp
     Version.cpp
 )
 

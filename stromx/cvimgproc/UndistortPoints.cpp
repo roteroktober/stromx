@@ -10,6 +10,7 @@
 #include <stromx/runtime/Id2DataComposite.h>
 #include <stromx/runtime/Id2DataPair.h>
 #include <stromx/runtime/ReadAccess.h>
+#include <stromx/runtime/VariantComposite.h>
 #include <stromx/runtime/WriteAccess.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -24,7 +25,7 @@ namespace stromx
         UndistortPoints::UndistortPoints()
           : runtime::OperatorKernel(TYPE, PACKAGE, VERSION, setupInitParameters()),
             m_cameraMatrix(cvsupport::Matrix::eye(3, 3, runtime::Matrix::FLOAT_32)),
-            m_distCoeffs(cvsupport::Matrix::zeros(4, 1, runtime::Matrix::FLOAT_32)),
+            m_distCoeffs(cvsupport::Matrix::zeros(1, 5, runtime::Matrix::FLOAT_32)),
             m_dataFlow()
         {
         }
@@ -53,33 +54,33 @@ namespace stromx
                 case CAMERA_MATRIX:
                     {
                         const runtime::Matrix & castedValue = runtime::data_cast<runtime::Matrix>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_MATRIX))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_MATRIX))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkMatrixValue(castedValue, m_cameraMatrixParameter, *this);
+                        cvsupport::checkMatrixValue(castedValue, m_cameraMatrixParameter, *this);
                         m_cameraMatrix = castedValue;
                     }
                     break;
                 case DIST_COEFFS:
                     {
                         const runtime::Matrix & castedValue = runtime::data_cast<runtime::Matrix>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::FLOAT_MATRIX))
+                        if(! castedValue.variant().isVariant(runtime::Variant::FLOAT_MATRIX))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkMatrixValue(castedValue, m_distCoeffsParameter, *this);
+                        cvsupport::checkMatrixValue(castedValue, m_distCoeffsParameter, *this);
                         m_distCoeffs = castedValue;
                     }
                     break;
                 case DATA_FLOW:
                     {
                         const runtime::Enum & castedValue = runtime::data_cast<runtime::Enum>(value);
-                        if(! castedValue.variant().isVariant(runtime::DataVariant::ENUM))
+                        if(! castedValue.variant().isVariant(runtime::Variant::ENUM))
                         {
                             throw runtime::WrongParameterType(parameter(id), *this);
                         }
-                        checkEnumValue(castedValue, m_dataFlowParameter, *this);
+                        cvsupport::checkEnumValue(castedValue, m_dataFlowParameter, *this);
                         m_dataFlow = castedValue;
                     }
                     break;
@@ -108,18 +109,18 @@ namespace stromx
             {
             case(ALLOCATE):
                 {
-                    m_cameraMatrixParameter = new runtime::MatrixParameter(CAMERA_MATRIX, runtime::DataVariant::FLOAT_MATRIX);
+                    m_cameraMatrixParameter = new runtime::MatrixParameter(CAMERA_MATRIX, runtime::Variant::FLOAT_MATRIX);
                     m_cameraMatrixParameter->setAccessMode(runtime::Parameter::ACTIVATED_WRITE);
                     m_cameraMatrixParameter->setTitle(L_("Camera matrix"));
                     m_cameraMatrixParameter->setRows(3);
                     m_cameraMatrixParameter->setCols(3);
                     parameters.push_back(m_cameraMatrixParameter);
                     
-                    m_distCoeffsParameter = new runtime::MatrixParameter(DIST_COEFFS, runtime::DataVariant::FLOAT_MATRIX);
+                    m_distCoeffsParameter = new runtime::MatrixParameter(DIST_COEFFS, runtime::Variant::FLOAT_MATRIX);
                     m_distCoeffsParameter->setAccessMode(runtime::Parameter::ACTIVATED_WRITE);
                     m_distCoeffsParameter->setTitle(L_("Distortion coefficients"));
-                    m_distCoeffsParameter->setRows(4);
-                    m_distCoeffsParameter->setCols(1);
+                    m_distCoeffsParameter->setRows(1);
+                    m_distCoeffsParameter->setCols(5);
                     parameters.push_back(m_distCoeffsParameter);
                     
                 }
@@ -137,7 +138,7 @@ namespace stromx
             {
             case(ALLOCATE):
                 {
-                    m_srcDescription = new runtime::MatrixDescription(SRC, runtime::DataVariant::FLOAT_MATRIX);
+                    m_srcDescription = new runtime::MatrixDescription(SRC, runtime::Variant::FLOAT_32_MATRIX);
                     m_srcDescription->setTitle("Source");
                     m_srcDescription->setRows(0);
                     m_srcDescription->setCols(2);
@@ -158,8 +159,10 @@ namespace stromx
             {
             case(ALLOCATE):
                 {
-                    runtime::Description* dst = new runtime::Description(DST, runtime::DataVariant::FLOAT_MATRIX);
+                    runtime::MatrixDescription* dst = new runtime::MatrixDescription(DST, runtime::Variant::FLOAT_32_MATRIX);
                     dst->setTitle(L_("Destination"));
+                    dst->setRows(0);
+                    dst->setCols(2);
                     outputs.push_back(dst);
                     
                 }
@@ -197,7 +200,7 @@ namespace stromx
                     }
                     
                     const runtime::Matrix* srcCastedData = runtime::data_cast<runtime::Matrix>(srcData);
-                    checkMatrixData(*srcCastedData, m_srcDescription, *this);
+                    cvsupport::checkMatrixValue(*srcCastedData, m_srcDescription, *this);
                     
                     cv::Mat srcCvData = cvsupport::getOpenCvMat(*srcCastedData, 2);
                     cv::Mat dstCvData;
@@ -207,15 +210,15 @@ namespace stromx
                     cv::undistortPoints(srcCvData, dstCvData, cameraMatrixCvData, distCoeffsCvData);
                     
                     runtime::Matrix* dstCastedData = new cvsupport::Matrix(dstCvData);
-                    runtime::DataContainer outContainer = runtime::DataContainer(dstCastedData);
-                    runtime::Id2DataPair outputMapper(DST, outContainer);
+                    runtime::DataContainer dstOutContainer = runtime::DataContainer(dstCastedData);
+                    runtime::Id2DataPair dstOutMapper(DST, dstOutContainer);
                     
-                    provider.sendOutputData(outputMapper);
+                    provider.sendOutputData(dstOutMapper);
                 }
                 break;
             }
         }
         
-    }
-}
+    } // cvimgproc
+} // stromx
 
